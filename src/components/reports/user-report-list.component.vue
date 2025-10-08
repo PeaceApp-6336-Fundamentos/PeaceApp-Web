@@ -20,16 +20,16 @@
         <li v-for="report in filteredReports" :key="report.id" class="report-item">
           <h2>{{ report.title }}</h2>
           <p><strong>{{ $t('reports.type_label') }}</strong> {{ translateType(report.type) }}</p>
-          <p><strong>{{ $t('reports.address_label') || 'Address:' }}</strong> {{ report.address }}</p>
-          <p><strong>{{ $t('reports.description_label') }}</strong> {{ report.detail }}</p>
+          <p><strong>{{ $t('reports.address_label') || 'Address:' }}</strong> {{ report.location }}</p>
+          <p><strong>{{ $t('reports.description_label') }}</strong> {{ report.description }}</p>
           <p>
             <strong>{{ $t('reports.user_label') }}</strong>
             <span v-if="report.citizenFullName">{{ report.citizenFullName }}</span>
             <span v-else>{{ formatDate(report.createdAt) }}</span>
           </p>
-          <p v-if="report.image">
+          <p v-if="report.imageUrl">
             <strong>{{ $t('reports.evidence_label') || 'Evidence:' }}</strong><br>
-            <img :src="report.image" alt="Evidence" style="max-width: 100%; border-radius: 8px; margin-top: 8px;" />
+            <img :src="report.imageUrl" alt="Evidence" style="max-width: 100%; border-radius: 8px; margin-top: 8px;" />
           </p>
 
         </li>
@@ -85,16 +85,11 @@ export default {
   methods: {
     translateType(type) {
       const types = {
-        Robo: this.$t('reportForm.placeholders.robbery'),
-        Accidente: this.$t('reportForm.placeholders.accident'),
-        Oscuro: this.$t('reportForm.placeholders.dark_area'),
-        Acoso: this.$t('reportForm.placeholders.harassment'),
-        Otro: this.$t('reportForm.placeholders.other'),
-        robbery: this.$t('reportForm.placeholders.robbery'),
-        accident: this.$t('reportForm.placeholders.accident'),
-        dark_area: this.$t('reportForm.placeholders.dark_area'),
-        harassment: this.$t('reportForm.placeholders.harassment'),
-        other: this.$t('reportForm.placeholders.other')
+        ROBBERY: this.$t('reportForm.placeholders.robbery'),
+        ACCIDENT: this.$t('reportForm.placeholders.accident'),
+        DARK_AREA: this.$t('reportForm.placeholders.dark_area'),
+        HARASSMENT: this.$t('reportForm.placeholders.harassment'),
+        OTHER: this.$t('reportForm.placeholders.other')
       };
       return types[type] || type;
     },

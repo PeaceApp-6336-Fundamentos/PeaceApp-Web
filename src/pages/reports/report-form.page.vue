@@ -95,7 +95,9 @@ export default {
         type: "",
         user_id: 0,
         image: "",
-        address: ""
+        address: "",
+        latitude: null,
+        longitude: null
       },
       api: new ReportApiService(),
       locationApi: new LocationApiService(),
@@ -114,25 +116,33 @@ export default {
   methods: {
     async createReport() {
       this.reportData.user_id = parseInt(localStorage.getItem("userId")) || 0;
+
       if (!this.reportData.image) return alert("Por favor, sube una imagen como evidencia.");
       if (!this.reportData.address) return alert("Por favor, selecciona una ubicación válida en el mapa.");
+
       this.reportData.address = this.reportData.address.replace(/,/g, '');
 
       try {
-        const reportResponse = await this.api.create(this.reportData);
-        const reportId = reportResponse?.data?.id;
+        // 🔹 Armar payload que coincida con el backend
+        const payload = {
+          title: this.reportData.title,
+          description: this.reportData.detail,
+          location: this.reportData.address,
+          type: this.reportData.type.toUpperCase(),
+          userId: this.reportData.user_id,
+          imageUrl: this.reportData.image,
+          latitude: this.reportData.latitude?.toString(),
+          longitude: this.reportData.longitude?.toString()
+        };
 
+        const reportResponse = await this.api.create(payload);
+        const reportId = reportResponse?.data?.id;
         if (!reportId) throw new Error("No se recibió el ID del reporte.");
 
-        // Crear la ubicación asociada
-        console.log("Creando ubicación con:", {
-          latitude: this.coordinates.lat,
-          longitude: this.coordinates.lng,
-          idReport: reportId
-        });
+        // Crear ubicación asociada
         await this.locationApi.createLocation({
-          latitude: this.coordinates.lat,
-          longitude: this.coordinates.lng,
+          latitude: this.reportData.latitude,
+          longitude: this.reportData.longitude,
           idReport: reportId
         });
 
@@ -218,11 +228,13 @@ export default {
         const data = await response.json();
         const place = data.features[0]?.place_name || `${lat}, ${lng}`;
         this.reportData.address = place;
-        this.coordinates = { lat, lng };
+        this.reportData.latitude = lat;
+        this.reportData.longitude = lng;
       } catch (error) {
         console.error("Reverse geocoding failed:", error);
         this.reportData.address = `${lat}, ${lng}`;
-        this.coordinates = { lat, lng };
+        this.reportData.latitude = lat;
+        this.reportData.longitude = lng;
       }
     }
   }

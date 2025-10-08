@@ -1,8 +1,8 @@
 export class Location {
-    constructor(id, idReport, alongitude, alatitude) {
+    constructor(id, idReport, longitude, latitude) {
         this.id = id;
         this.idReport = idReport;
-        this.alongitude = alongitude;
-        this.alatitude = alatitude;
+        this.longitude = longitude;
+        this.latitude = latitude;
     }
 }

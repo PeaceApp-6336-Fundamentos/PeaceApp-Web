@@ -82,10 +82,16 @@ export default {
   methods: {
     async deleteExistingAlerts() {
       try {
-        const response = await this.alertApi.deleteAll();
-        console.log("All alerts deleted:", response.status);
+        const userId = parseInt(localStorage.getItem("userId"));
+        if (!userId) {
+          console.warn("User ID not found, skipping alert deletion.");
+          return;
+        }
+
+        const response = await this.alertApi.deleteByUserId(userId);
+        console.log(`Alerts deleted for user ID ${userId}:`, response.status);
       } catch (err) {
-        console.error("Error deleting alerts on first load:", err);
+        console.error("Error deleting alerts for this user:", err);
       }
     },
     calculateDistance(lat1, lon1, lat2, lon2) {
@@ -102,25 +108,40 @@ export default {
       return R * c * 1000;
     },
     async checkNearbyReports() {
+      console.log("📡 Ejecutando checkNearbyReports()...");
       try {
         const [locRes, repRes] = await Promise.all([
           this.locationApi.getAll(),
           this.reportApi.getAll()
         ]);
+
         const locations = locRes.data;
         const reports = repRes.data;
+
+
         const userLat = this.currentLocation.lat;
         const userLng = this.currentLocation.lng;
+
         for (const loc of locations) {
-          if (!loc || loc.alatitude === 0 || loc.alongitude === 0) continue;
-          if (this.processedReports.has(loc.idReport)) continue;
-          const dist = this.calculateDistance(userLat, userLng, loc.alatitude, loc.alongitude);
+          if (!loc || loc.latitude === 0 || loc.longitude === 0) continue;
+          console.log("🧭 Analizando ubicación:", loc);
+
+          if (this.processedReports.has(loc.idReport)) {
+            console.log(`🔁 Reporte ${loc.idReport} ya procesado`);
+
+          }
+
+          const dist = this.calculateDistance(userLat, userLng, loc.latitude, loc.longitude);
+          console.log(`📏 Distancia a reporte ${loc.idReport}: ${dist.toFixed(2)}m`);
+
           if (dist <= 100) {
             const report = reports.find(r => r.id === loc.idReport);
-            if (report) {
-              await this.createAlert(report);
-              this.processedReports.add(loc.idReport);
+            if (!report) {
+              console.warn(`⚠️ Reporte no encontrado para loc.idReport=${loc.idReport}`);
             }
+            console.log(`✅ Reporte ${loc.idReport} dentro de rango, creando alerta...`);
+            await this.createAlert(report);
+            this.processedReports.add(loc.idReport);
           }
         }
       } catch (err) {
@@ -128,41 +149,56 @@ export default {
       }
     },
     async createAlert(report) {
+      console.log(`🚀 Creando alerta para reporte ID ${report.id} (${report.type})`);
+
       const alertData = {
-        location: report.address,
-        type: report.type,
-        description: report.detail,
-        idUser: parseInt(localStorage.getItem("userId")),
-        imageUrl: report.image,
-        idReport: report.id
+        location: report.location,
+        type: report.type?.toUpperCase(),
+        description: report.description,
+        userId: parseInt(localStorage.getItem("userId")),
+        imageUrl: report.imageUrl,
+        reportId: report.id
       };
+
+      console.log("🛰️ Preparando alerta para enviar:", alertData);
+
       try {
-        const existingAlerts = await this.alertApi.getByUserId(alertData.idUser);
-        const alreadyExists = existingAlerts.data.some(alert =>
-            alert.idReport === alertData.idReport &&
-            alert.type === alertData.type &&
-            alert.location === alertData.location
-        );
-        if (!alreadyExists) {
-          await this.alertApi.create(alertData);
-          console.log("Alert created:", alertData);
+        const existingAlerts = await this.alertApi.getByUserId(alertData.userId);
+
+        if (existingAlerts?.status === 404 || !Array.isArray(existingAlerts?.data)) {
+          console.log("ℹ️ No se encontraron alertas previas para este usuario.");
+        } else {
+          const alreadyExists = existingAlerts.data.some(alert =>
+              alert.reportId === alertData.reportId &&
+              alert.type === alertData.type &&
+              alert.location === alertData.location
+          );
+          if (alreadyExists) {
+            console.log("⚠️ Alerta ya existente, no se enviará:", alertData);
+            return;
+          }
         }
+
+        console.log("📤 Enviando alerta al backend...");
+        const res = await this.alertApi.create(alertData);
+        console.log("✅ Alerta creada exitosamente:", res.data);
       } catch (error) {
-        console.error("Error creating alert:", error);
+        console.error("❌ Error al crear la alerta:");
+        if (error.response) {
+          console.error("🔸 Status:", error.response.status);
+          console.error("🔸 Datos del backend:", error.response.data);
+        } else {
+          console.error("🔸 Error general:", error.message || error);
+        }
       }
     },
     translateType(type) {
       const types = {
-        Robo: this.$t('reportForm.placeholders.robbery'),
-        Accidente: this.$t('reportForm.placeholders.accident'),
-        Oscuro: this.$t('reportForm.placeholders.dark_area'),
-        Acoso: this.$t('reportForm.placeholders.harassment'),
-        Otro: this.$t('reportForm.placeholders.other'),
-        robbery: this.$t('reportForm.placeholders.robbery'),
-        accident: this.$t('reportForm.placeholders.accident'),
-        dark_area: this.$t('reportForm.placeholders.dark_area'),
-        harassment: this.$t('reportForm.placeholders.harassment'),
-        other: this.$t('reportForm.placeholders.other')
+        ROBBERY: this.$t('reportForm.placeholders.robbery'),
+        ACCIDENT: this.$t('reportForm.placeholders.accident'),
+        DARK_AREA: this.$t('reportForm.placeholders.dark_area'),
+        HARASSMENT: this.$t('reportForm.placeholders.harassment'),
+        OTHER: this.$t('reportForm.placeholders.other')
       };
       return types[type] || type;
     },
@@ -180,10 +216,10 @@ export default {
           this.reportMap[report.id] = report;
         });
         locations.forEach(loc => {
-          const lat = parseFloat(loc.alatitude);
-          const lng = parseFloat(loc.alongitude);
+          const lat = parseFloat(loc.latitude);
+          const lng = parseFloat(loc.longitude);
           if (isNaN(lat) || isNaN(lng)) return;
-          const report = this.reportMap[loc.idReport];
+          const report = this.reportMap[loc.idReport || loc.idReport];
           if (!report) return;
           this.createMarker(lng, lat, report);
         });
@@ -195,16 +231,11 @@ export default {
       const el = document.createElement('div');
       el.className = 'custom-marker';
       const typeToImage = {
-        Robo: robTag,
-        robbery: robTag,
-        Accidente: carTag,
-        accident: carTag,
-        Oscuro: illumTag,
-        dark_area: illumTag,
-        Acoso: acosoTag,
-        harassment: acosoTag,
-        Otro: redMarker,
-        other: redMarker
+        ROBBERY: robTag,
+        ACCIDENT: carTag,
+        DARK_AREA: illumTag,
+        HARASSMENT: acosoTag,
+        OTHER: redMarker
       };
       const imageUrl = typeToImage[report.type] || redMarker;
       el.style.backgroundImage = `url('${imageUrl}')`;

@@ -15,15 +15,6 @@ export default {
     };
   },
   mounted() {
-    this.userService.signInUser('string@string', 'string').then(
-        (res) => {
-          console.log('res', res);
-        },
-        error => {
-          console.log(error);
-        }
-    );
-    console.log(this.users);
   },
   computed: {
     faqContent() {

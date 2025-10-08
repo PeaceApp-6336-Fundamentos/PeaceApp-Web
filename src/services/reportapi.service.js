@@ -31,7 +31,7 @@ export class ReportApiService {
     // GET all reports
     async getAll() {
         try {
-            return await axios.get(`${this.baseUrl}/reports/`, {
+            return await axios.get(`${this.baseUrl}/reports`, {
                 headers: this.getAuthHeaders()
             });
         } catch (error) {
@@ -43,7 +43,7 @@ export class ReportApiService {
     // POST create a new report
     async create(data) {
         try {
-            return await axios.post(`${this.baseUrl}/reports/`, data, {
+            return await axios.post(`${this.baseUrl}/reports`, data, {
                 headers: this.getAuthHeaders()
             });
         } catch (error) {

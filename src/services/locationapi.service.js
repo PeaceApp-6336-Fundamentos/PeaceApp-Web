@@ -17,7 +17,7 @@ export class LocationApiService {
     // GET all locations
     async getAll() {
         try {
-            return await axios.get(`${this.baseUrl}/locations/`, {
+            return await axios.get(`${this.baseUrl}/locations`, {
                 headers: this.getAuthHeaders()
             });
         } catch (error) {
@@ -41,7 +41,7 @@ export class LocationApiService {
     // POST create a new location
     async createLocation(locationData) {
         try {
-            return await axios.post(`${this.baseUrl}/locations/`, locationData, {
+            return await axios.post(`${this.baseUrl}/locations`, locationData, {
                 headers: this.getAuthHeaders()
             });
         } catch (error) {

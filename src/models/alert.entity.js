@@ -1,10 +1,10 @@
 export class Alert {
-    constructor(location, type, description, idUser, image_url, idReport) {
+    constructor(location, type, description, userId, imageUrl, idReport) {
         this.location = location;
         this.type = type;
         this.description = description;
-        this.idUser = idUser;
-        this.image_url = image_url;
-        this.idReport = idReport;
+        this.userId = userId;
+        this.imageUrl = imageUrl;
+        this.reportId = idReport;
     }
 }

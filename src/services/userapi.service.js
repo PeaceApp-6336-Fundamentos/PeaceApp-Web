@@ -28,7 +28,7 @@ export class UserApiService {
 
     async getUserByEmail(email) {
         try {
-            return await axios.get(`${this.baseUrl}/users/${email}`, {
+            return await axios.get(`${this.baseUrl}/users/email/${email}`, {
                 headers: this.getAuthHeaders()
             });
         } catch (e) {

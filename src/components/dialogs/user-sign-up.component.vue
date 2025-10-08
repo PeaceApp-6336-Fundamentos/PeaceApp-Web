@@ -87,7 +87,7 @@ export default {
           email: this.formData.email,
           password: this.formData.password,
           phonenumber: this.formData.phonenumber,
-          user_id: user.id,
+          userId: user.id,
           profile_image: this.formData.profileImage
         };
 

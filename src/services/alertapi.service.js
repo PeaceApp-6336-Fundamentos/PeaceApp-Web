@@ -17,7 +17,7 @@ export class AlertApiService {
     // GET all alerts
     async getAll() {
         try {
-            return await axios.get(`${this.baseUrl}/alerts/`, {
+            return await axios.get(`${this.baseUrl}/alerts`, {
                 headers: this.getAuthHeaders()
             });
         } catch (error) {
@@ -53,7 +53,7 @@ export class AlertApiService {
     // POST create new alert
     async create(data) {
         try {
-            return await axios.post(`${this.baseUrl}/alerts/`, data, {
+            return await axios.post(`${this.baseUrl}/alerts`, data, {
                 headers: this.getAuthHeaders()
             });
         } catch (error) {
@@ -63,9 +63,9 @@ export class AlertApiService {
     }
 
     // DELETE all alerts
-    async deleteAll() {
+    async deleteByUserId(userId) {
         try {
-            return await axios.delete(`${this.baseUrl}/alerts/`, {
+            return await axios.delete(`${this.baseUrl}/alerts/user/${userId}`, {
                 headers: this.getAuthHeaders()
             });
         } catch (error) {

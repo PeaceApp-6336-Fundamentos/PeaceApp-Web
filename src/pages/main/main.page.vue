@@ -26,7 +26,7 @@ export default {
   },
   methods: {
     redirectLanding() {
-      window.location.href = 'https://peaceapp-landing-page.netlify.app';
+      window.location.href = 'https://peaceapp-landingpage.netlify.app';
     },
 
     generateCaptcha() {

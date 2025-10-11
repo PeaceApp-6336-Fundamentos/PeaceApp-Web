@@ -8,6 +8,7 @@ export default {
       authService: new authUserService(),
       userApiService: new UserApiService(),
       confirmPassword: '',
+      isSubmitting: false,
       formData: {
         name: '',
         lastname: '',
@@ -47,11 +48,15 @@ export default {
     },
 
     async createUser() {
+      if (this.isSubmitting) return;
+      this.isSubmitting = true;
       this.error = null;
       this.success = null;
 
-      if (!this.validateInputs()) return;
-
+      if (!this.validateInputs()) {
+        this.isSubmitting = false;
+        return;
+      }
       try {
         const signUpData = {
           username: this.formData.email,
@@ -170,8 +175,35 @@ export default {
     <p v-if="success" class="success">{{ success }}</p>
   </form>
 </template>
-
 <style scoped>
+button {
+  font-size: 16px;
+  padding: 10px 20px;
+  border: none;
+  background-color: #3498db;
+  color: white;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  width: 100%;
+  max-width: 200px;
+  margin-top: 10px;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+body.dark button {
+  background-color: #22487A;
+  color: white;
+}
+
+body.dark button:hover {
+  background-color: #2b5dab;
+}
+
 .form {
   display: flex;
   flex-direction: column;
@@ -184,6 +216,12 @@ export default {
   justify-content: center;
   background-color: #55B0DB;
   box-sizing: border-box;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark .form {
+  background-color: #1e1e1e;
+  color: #f5f5f5;
 }
 
 .message {
@@ -193,11 +231,16 @@ export default {
   margin-bottom: 10px;
 }
 
+body.dark .message {
+  color: #ccc;
+}
+
 .flex {
   display: flex;
   gap: 10px;
   width: 100%;
   margin-bottom: 10px;
+  flex-wrap: wrap;
 }
 
 .input-style {
@@ -207,24 +250,21 @@ export default {
   border: 1px solid #ccc;
   font-size: 14px;
   box-sizing: border-box;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-button {
-  font-size: 16px;
-  padding: 10px 20px;
-  border: none;
-  background-color: #fff;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  width: 100%;
-  max-width: 200px;
-  margin-top: 10px;
+body.dark .input-style {
+  background-color: #2a2a2a;
+  color: #f5f5f5;
+  border: 1px solid #444;
 }
 
-button:hover {
-  background-color: #eee;
+.input-style::placeholder {
+  color: #999;
+}
+
+body.dark .input-style::placeholder {
+  color: #aaa;
 }
 
 .material-checkbox {
@@ -233,6 +273,10 @@ button:hover {
   font-size: 14px;
   color: #444;
   margin-top: 10px;
+}
+
+body.dark .material-checkbox {
+  color: #ccc;
 }
 
 .material-checkbox input[type="checkbox"] {
@@ -287,6 +331,21 @@ button:hover {
   border-color: #4d4d4d;
 }
 
+.error {
+  color: #b00020;
+  margin-top: 10px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.success {
+  color: #2e7d32;
+  margin-top: 10px;
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .form {
     padding: 15px;
@@ -331,4 +390,3 @@ button:hover {
   }
 }
 </style>
-

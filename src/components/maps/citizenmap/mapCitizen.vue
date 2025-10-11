@@ -8,7 +8,12 @@
       <div class="destinationInput">
         <div class="subtitle"><h2>{{ $t('map.question') }}</h2></div>
         <div class="pv-inputgroup">
-          <pv-inputtext class="input" v-model="endLocationInput" type="text" :placeholder="$t('map.placeholder')" />
+          <pv-inputtext class="input" v-model="endLocationInput" type="text" :placeholder="$t('map.placeholder')" @input="fetchSuggestions(endLocationInput)"/>
+          <ul v-if="suggestions.length" class="suggestions-list">
+            <li v-for="(s, index) in suggestions" :key="index" @click="selectSuggestion(s)">
+              {{ s.place_name }}
+            </li>
+          </ul>
           <button class="icon" @click="calculateRoute" :disabled="isLoading">
             <i class="pi" :class="{'pi-search': !isLoading, 'pi-spinner pi-spin': isLoading}" style="color: black"></i>
           </button>
@@ -18,16 +23,6 @@
     </div>
     <div id="map">
       <div id="center-pin"></div>
-    </div>
-    <div id="sidebar" v-if="hasRoute">
-      <h3>{{ $t('map.directions') }}</h3>
-      <div class="route-info">
-        <p><strong>{{ $t('map.distance') }}:</strong> {{ routeDistance }} km</p>
-        <p><strong>{{ $t('map.duration') }}:</strong> {{ routeDuration }} min</p>
-      </div>
-      <div v-for="(instruction, index) in routeInstructions" :key="index" class="instruction">
-        {{ instruction }}
-      </div>
     </div>
   </div>
 </template>
@@ -65,7 +60,9 @@ export default {
       routeDuration: 0,
       routeInstructions: [],
       alertApi: new AlertApiService(),
-      processedReports: new Set()
+      processedReports: new Set(),
+      suggestions: [],
+      showSuggestions: false,
     };
   },
   mounted() {
@@ -80,6 +77,31 @@ export default {
     }
   },
   methods: {
+    async fetchSuggestions(query) {
+      if (!query) {
+        this.suggestions = [];
+        return;
+      }
+      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxgl.accessToken}&autocomplete=true&limit=5`;
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        this.suggestions = data.features;
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
+      }
+    },
+    selectSuggestion(suggestion) {
+      this.endLocationInput = suggestion.place_name;
+      this.suggestions = [];
+      this.map.flyTo({ center: suggestion.center, zoom: 14 });
+      this.currentLocation.lat = suggestion.center[1];
+      this.currentLocation.lng = suggestion.center[0];
+      localStorage.setItem("userLat", suggestion.center[1]);
+      localStorage.setItem("userLng", suggestion.center[0]);
+      this.hasRoute = true;
+      this.checkNearbyReports();
+    },
     async deleteExistingAlerts() {
       try {
         const userId = parseInt(localStorage.getItem("userId"));
@@ -375,46 +397,125 @@ export default {
   }
 };
 </script>
-<style>
-
-.custom-marker {
-  background-image: url('/src/assets/red_marker.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  width: 50px;
-  height: 50px;
-  cursor: pointer;
-  will-change: transform;
-}
-
-.mapboxgl-marker {
-  transition: transform 0.2s;
-}
-</style>
 
 <style scoped>
+/* Contenedor oscuro */
+.mapboxgl-ctrl-group {
+  background-color: #1e1e2f !important; /* fondo contenedor */
+  border: 1px solid #333 !important;
+  border-radius: 4px;
+}
+
+/* Botones oscuros */
+.mapboxgl-ctrl-group button {
+  background-color: #1e1e2f !important; /* fondo botón */
+  color: white !important;
+  border: none;
+}
+
+/* Íconos dentro del botón (invertir color si es necesario) */
+.mapboxgl-ctrl-icon {
+  filter: invert(1); /* blanco sobre fondo oscuro */
+}
+
+/* Hover */
+.mapboxgl-ctrl-group button:hover {
+  background-color: #2c2c3c !important;
+}
+
+
+.suggestions-list {
+  list-style: none;
+  padding: 0;
+  margin: 290px 0 auto;
+  width: 80%;
+  max-width: 600px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  position: absolute;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  max-height: 230px; /* altura para 5 items aprox */
+  min-height: 230px; /* asegura tamaño fijo aunque haya menos */
+  overflow-y: auto;
+}
+
+.suggestions-list li {
+  padding: 10px;
+  cursor: pointer;
+  color: black;
+  background-color: white;
+}
+
+.suggestions-list li:hover {
+  background-color: #eee;
+}
+
+.p-autocomplete .p-autocomplete-panel .p-autocomplete-items .p-autocomplete-item {
+  color: black !important;
+}
+:deep(html),
+:deep(body),
+:deep(#app),
+:deep(main),
+:deep(.container) {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  box-sizing: border-box;
+}
+
 .container {
-  padding: 100px 0 0 0;
+  margin: 100px auto 0;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  color: white;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  min-height: 100vh;
+  justify-content: flex-start;
 }
 
 #map {
+  width: 90vw !important;
   height: 500px;
-  width: 100%;
-  margin-bottom: 20px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  display: block;
+  line-height: 0;
   position: relative;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
+/* MODO OSCURO: Estilo de botones del mapa */
+body.dark .mapboxgl-ctrl-group,
+body.dark .maplibregl-ctrl-group {
+  background-color: #222 !important;
+  border: 1px solid #444 !important;
+}
+
+body.dark .mapboxgl-ctrl button,
+body.dark .maplibregl-ctrl button {
+  background-color: #222 !important;
+  color: white !important;
+  filter: brightness(200%) !important;
+}
+
+body.dark .mapboxgl-ctrl button:hover,
+body.dark .maplibregl-ctrl button:hover {
+  background-color: #444 !important;
+}
+
+body.dark .mapboxgl-ctrl button > svg,
+body.dark .maplibregl-ctrl button > svg {
+  filter: invert(1) !important;
+}
+
+/* Centro del mapa */
 #center-pin {
   position: absolute;
   top: 50%;
@@ -429,6 +530,7 @@ export default {
   pointer-events: none;
 }
 
+/* Estilos generales */
 .search {
   display: block;
   text-align: center;
@@ -459,12 +561,22 @@ export default {
   overflow: hidden;
 }
 
+body.dark .pv-inputgroup {
+  border-color: #aaa;
+  background-color: #333;
+}
+
 .input {
   border: none;
   padding: 12px;
   width: 90%;
   font-size: 16px;
   outline: none;
+}
+
+body.dark .input {
+  background-color: #333;
+  color: #fff;
 }
 
 .icon {
@@ -479,8 +591,16 @@ export default {
   justify-content: center;
 }
 
+body.dark .icon {
+  background-color: #333;
+}
+
 .icon:hover {
   background-color: #f0f0f0;
+}
+
+body.dark .icon:hover {
+  background-color: #444;
 }
 
 .icon:disabled {
@@ -506,19 +626,28 @@ export default {
 
 #sidebar {
   background-color: #f0f0f0;
-  width: 100%;
-  max-height: 300px;
-  overflow: auto;
+  width: 98%;
+  max-width: 1600px;
+  margin: 0 auto;
   border-radius: 8px;
   padding: 15px;
   margin-top: 20px;
   color: #333;
 }
 
+body.dark #sidebar {
+  background-color: #222;
+  color: #eee;
+}
+
 #sidebar h3 {
   margin-top: 0;
   color: #2c3e50;
   font-size: 18px;
+}
+
+body.dark #sidebar h3 {
+  color: #ccc;
 }
 
 .route-info {
@@ -529,10 +658,19 @@ export default {
   font-size: 14px;
 }
 
+body.dark .route-info {
+  background-color: #333;
+  color: #eee;
+}
+
 .instruction {
   padding: 8px 0;
   border-bottom: 1px solid #ddd;
   font-size: 14px;
+}
+
+body.dark .instruction {
+  border-bottom: 1px solid #444;
 }
 
 .instruction:last-child {
@@ -548,6 +686,11 @@ export default {
   font-size: 14px;
 }
 
+body.dark .error-message {
+  background-color: rgba(255, 100, 100, 0.1);
+}
+
+/* Responsive */
 @media (max-width: 768px) {
   .container {
     padding-top: 80px;
@@ -566,6 +709,10 @@ export default {
   }
 
   .pv-inputgroup {
+    width: 95%;
+  }
+
+  #sidebar {
     width: 95%;
   }
 }
@@ -588,4 +735,5 @@ export default {
     max-height: 200px;
   }
 }
+
 </style>

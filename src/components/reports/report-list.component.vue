@@ -20,6 +20,7 @@ export default {
 </script>
 
 <style scoped>
+/* === Estilos normales === */
 .parent-container {
   display: flex;
   flex-direction: column;
@@ -55,7 +56,24 @@ export default {
   font-size: 20px;
   text-decoration: none;
 }
+
 .btn:hover {
   background-color: #A1B9C6;
 }
+
+/* === MODO OSCURO === */
+body.dark .header-container {
+  background-color: #1e1e1e;
+  color: #f5f5f5;
+}
+
+body.dark .btn {
+  background-color: #444;
+  color: #f5f5f5;
+}
+
+body.dark .btn:hover {
+  background-color: #666;
+}
+
 </style>

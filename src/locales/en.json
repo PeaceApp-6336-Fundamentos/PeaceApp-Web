@@ -111,8 +111,28 @@
     "cvv": "CVV",
     "checkout": "Checkout"
   },
+  "comments": {
+    "title": "Comments",
+    "none": "No comments yet.",
+    "user": "User",
+    "unknown": "Unknown",
+    "date": "Date",
+    "edited_at": "Edited on",
+    "edit": "Edit",
+    "delete": "Delete",
+    "edit_modal_title": "Edit comment",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm_delete": "Are you sure you want to delete this comment?",
+    "confirm_yes": "Yes, delete",
+    "submit": "Submit comment",
+    "placeholder": "Write your comment..."
+  },
+
   "reports": {
     "title": "Report list",
+    "alert": "Alert",
+    "details": "Report details",
     "all": "All",
     "address_label": "Address",
     "type_label": "Type:",
@@ -121,6 +141,7 @@
     "location_label": "Location:",
     "description_label": "Description:",
     "user_label": "Date: ",
+    "realUser_label": "User: ",
     "view_scope": "Filters",
     "my_reports": "My Reports",
     "all_reports": "All Reports",
@@ -141,8 +162,16 @@
     "evidence": "Evidence: ",
     "upload": "Upload File",
     "send": "Send",
+    "alertImage": "Please upload an image as evidence.",
+    "alertAddress": "Please select a valid location on the map.",
+    "errorNoReportId": "Report ID not received.",
+    "successCreated": "Report created successfully.",
+    "errorCreateOrLocation": "Error creating report or location.",
+    "errorUploadImage": "Failed to upload image:",
+    "alertUploadImage": "Error uploading the image. Please try again.",
     "placeholders": {
       "type": "Select report type",
+      "all_types": "All",
       "robbery": "Robbery",
       "accident": "Accident",
       "dark_area": "Dark Area",
@@ -190,18 +219,18 @@
       "password": "Password: "
     },
     "authority": {
-        "email": "Email: ",
-        "contact_number": "Contact Number: ",
-        "office_address": "Office Address: ",
-        "description": "Description: "
+      "email": "Email: ",
+      "contact_number": "Contact Number: ",
+      "office_address": "Office Address: ",
+      "description": "Description: "
     },
     "edit": "Edit Profile",
     "logout": "Log out"
   },
-    "footer": {
-        "terms": "Terms and Conditions",
-        "questions": "Frequent Questions",
-        "contact": "Contact Us",
-        "about": "About Us"
-    }
+  "footer": {
+    "terms": "Terms and Conditions",
+    "questions": "Frequent Questions",
+    "contact": "Contact Us",
+    "about": "About Us"
+  }
 }

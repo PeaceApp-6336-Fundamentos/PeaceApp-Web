@@ -13,8 +13,6 @@
         </select>
       </div>
     </div>
-
-
     <div class="reports-container">
       <ul v-if="filteredReports.length" class="reports-grid">
         <li v-for="report in filteredReports" :key="report.id" class="report-item">
@@ -68,18 +66,19 @@ export default {
     this.role = localStorage.getItem("userRole");
   },
   computed: {
-    uniqueTypes() {
-      return [...new Set(this.reports.map(report => report.type))];
-    },
-    uniqueDistricts() {
-      return [...new Set(this.reports.map(report => report.district))];
-    },
     filteredReports() {
-      let filtered = this.reports;
-      if (this.filterType) filtered = filtered.filter(r => r.type === this.filterType);
-      if (this.filterDate) filtered = filtered.filter(r => r.date === this.filterDate);
-      if (this.filterDistrict) filtered = filtered.filter(r => r.district === this.filterDistrict);
-      return filtered;
+      if (!this.filterType) return this.reports;
+      const filter = this.filterType.toLowerCase();
+      return this.reports.filter(report => {
+        const type = (report.type || '').toLowerCase();
+        return (
+            (filter === 'robo' && (type === 'robo' || type === 'robbery')) ||
+            (filter === 'accidente' && (type === 'accidente' || type === 'accident')) ||
+            (filter === 'oscuro' && (type === 'oscuro' || type === 'dark_area')) ||
+            (filter === 'acoso' && (type === 'acoso' || type === 'harassment')) ||
+            (filter === 'otro' && (type === 'otro' || type === 'other'))
+        );
+      });
     }
   },
   methods: {
@@ -120,6 +119,7 @@ export default {
 };
 
 </script>
+
 
 <style scoped>
 .container {
@@ -241,5 +241,50 @@ a:hover {
   .reports-container{
     padding: 20px 0 0 0;
   }
+}
+/* ================= MODO OSCURO ================= */
+body.dark .container {
+  background-color: #121212;
+}
+
+body.dark h1,
+body.dark .filter-option label {
+  color: #f5f5f5;
+}
+
+body.dark .filter-option select,
+body.dark .filter-option input {
+  background-color: #2a2a2a;
+  color: #f5f5f5;
+  border: 1px solid #555;
+}
+
+body.dark .report-item {
+  background-color: #1e1e1e;
+  border-color: #333;
+  box-shadow: 0 1px 6px rgba(255, 255, 255, 0.05);
+}
+
+body.dark .report-item:hover {
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+}
+
+body.dark .report-item h2 {
+  color: #4ea3ff;
+}
+
+body.dark p {
+  color: #ccc;
+}
+
+body.dark a {
+  color: #7bbfff;
+}
+.report-item-link {
+  text-decoration: none;
+  color: inherit;
+}
+.report-item-link:hover {
+  text-decoration: none;
 }
 </style>

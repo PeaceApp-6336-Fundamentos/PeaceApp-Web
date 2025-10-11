@@ -89,6 +89,17 @@ export default {
   padding: 20vh 0 0 0;
   margin: 0 auto;
 }
+.show-pass {
+  background: none;
+  border: none;
+  cursor: pointer;
+  vertical-align: middle;
+  padding: 0;
+  margin-left: 10px;
+}
+.show-pass svg {
+  vertical-align: middle;
+}
 
 button {
   background-color: #C4E2F3;
@@ -107,6 +118,24 @@ button {
 button:hover {
   background-color: #A1B9C6;
 }
+
+.show-pass {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+.show-pass svg {
+  width: 20px;
+  height: 20px;
+}
+
 
 .container {
   padding: 10px;
@@ -156,8 +185,18 @@ button:hover {
     padding: 15px 0 0 0;
     display: inline-block;
   }
+  .img {
+    align-items: center;
+    justify-items: center;
+  }
   .popup-container {
     z-index: 1000;
   }
+}
+/* MODO OSCURO */
+body.dark .container {
+  background-color: #1e1e1e;
+  color: #f5f5f5;
+  border: 1px solid #444;
 }
 </style>

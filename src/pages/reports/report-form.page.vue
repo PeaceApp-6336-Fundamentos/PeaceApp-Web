@@ -117,8 +117,12 @@ export default {
     async createReport() {
       this.reportData.user_id = parseInt(localStorage.getItem("userId")) || 0;
 
-      if (!this.reportData.image) return alert("Por favor, sube una imagen como evidencia.");
-      if (!this.reportData.address) return alert("Por favor, selecciona una ubicación válida en el mapa.");
+      if (!this.reportData.image) {
+        return alert(this.$t('reportForm.alertImage'));
+      }
+      if (!this.reportData.address) {
+        return alert(this.$t('reportForm.alertAddress'));
+      }
 
       this.reportData.address = this.reportData.address.replace(/,/g, '');
 
@@ -137,7 +141,7 @@ export default {
 
         const reportResponse = await this.api.create(payload);
         const reportId = reportResponse?.data?.id;
-        if (!reportId) throw new Error("No se recibió el ID del reporte.");
+        if (!reportId) throw new Error(this.$t('reportForm.errorNoReportId'));
 
         // Crear ubicación asociada
         await this.locationApi.createLocation({
@@ -146,14 +150,14 @@ export default {
           idReport: reportId
         });
 
-        this.successMessage = "Reporte creado exitosamente";
+        this.successMessage = this.$t('reportForm.successCreated');
         this.showSuccessMessage = true;
         setTimeout(() => {
           this.showSuccessMessage = false;
           this.$router.push({ name: "reports" });
         }, 3000);
       } catch (error) {
-        console.error("Error al crear el reporte o la ubicación:", error);
+        console.error(this.$t('reportForm.errorCreateOrLocation'), error);
       }
     },
 
@@ -164,8 +168,8 @@ export default {
         const { secure_url } = await CloudinaryService.uploadImage(file);
         this.reportData.image = secure_url;
       } catch (error) {
-        console.error("Fallo al subir imagen:", error);
-        alert("Error al subir la imagen. Intenta nuevamente.");
+        console.error(this.$t('reportForm.errorUploadImage'), error);
+        alert(this.$t('reportForm.alertUploadImage'));
       }
     },
 
@@ -240,6 +244,7 @@ export default {
   }
 };
 </script>
+
 
 
 
@@ -608,5 +613,72 @@ button:hover {
   visibility: visible;
 }
 
+/* MODO OSCURO GENERAL */
+body.dark {
+  background-color: #121212;
+  color: #f5f5f5;
+}
+
+body.dark .form-container {
+  background-color: #1e1e1e;
+  color: #f5f5f5;
+}
+
+body.dark .label-black {
+  color: #ffffff;
+}
+
+body.dark input,
+body.dark select,
+body.dark textarea {
+  background-color: #2a2a2a;
+  color: #f5f5f5;
+  border: 1px solid #555;
+}
+
+body.dark input::placeholder,
+body.dark textarea::placeholder {
+  color: #bbb;
+}
+
+body.dark .description-area {
+  background-color: #2a2a2a;
+  color: #f5f5f5;
+  border-color: #555;
+}
+
+body.dark .upload-button {
+  background-color: #444;
+  color: #f5f5f5;
+}
+
+body.dark .upload-button:hover {
+  background-color: #666;
+}
+
+body.dark .button-container button,
+body.dark button {
+  background-color: #444;
+  color: #fff;
+}
+
+body.dark button:hover {
+  background-color: #666;
+}
+
+body.dark .success-message {
+  background-color: #274f35;
+  color: #d4edda;
+  border-color: #1f4030;
+}
+
+body.dark .page-container p {
+  color: #e0e0e0;
+}
+
+/* Mapa pin no necesita cambios, pero el contenedor podría */
+body.dark .map-image {
+  border: 1px solid #444;
+}
 
 </style>

@@ -9,7 +9,7 @@ export default {
       userEmail: '',
       userRole: '',
       locales: [{ code: 'en', name: '🇺🇸 English', flag: 'us' },
-        { code: 'es', name: '🇪🇸 Spanish', flag: 'es' }],
+        { code: 'es', name: '🇪🇸 Español', flag: 'es' }],
       showSelect: false,
       activeModal: null
     };
@@ -171,21 +171,32 @@ export default {
 </template>
 
 <style scoped>
-/* Base layout */
+main {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
 .container {
-  height: fit-content;
-  padding-bottom: 70px; /* Space for footer */
+  padding-bottom: 150px;
+  box-sizing: border-box;
 }
 
+/* ----------------- MODO CLARO (POR DEFECTO) ----------------- */
 body {
   margin: 0;
   display: flex;
   place-items: center;
   min-width: 500px;
   min-height: 100vh;
+  background-color: #ffffff;
+  color: #333;
 }
 
-/* Enhanced footer */
+
+/* FOOTER */
 footer {
   align-items: center;
   display: flex;
@@ -197,7 +208,6 @@ footer {
   color: #fff;
   padding: 15px 30px;
   background: linear-gradient(135deg, #3498db, #2c3e50);
-  height: fit-content;
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
   z-index: 100;
 }
@@ -239,12 +249,15 @@ footer {
   color: rgba(255, 255, 255, 0.3);
   user-select: none;
 }
-
-/* Language selector */
 .language-section {
   display: flex;
   align-items: center;
   gap: 15px;
+}
+
+/* Hover */
+.mapboxgl-ctrl-group button:hover {
+  background-color: #2c2c3c !important;
 }
 
 .locale-select {
@@ -254,6 +267,7 @@ footer {
   width: 120px;
   border: none;
   background-color: rgba(255, 255, 255, 0.9);
+  color: #000;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
@@ -275,7 +289,7 @@ img:hover {
   transform: scale(1.1);
 }
 
-/* Modals */
+/* MODALS */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -336,17 +350,29 @@ img:hover {
   color: #555;
 }
 
-pre {
-  white-space: pre-wrap;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  line-height: 1.5;
-  background-color: #f8f9fa;
-  padding: 15px;
-  border-radius: 6px;
-  border-left: 4px solid #3498db;
+.terms-section {
+  margin-bottom: 1.5rem;
 }
 
-/* Button */
+.terms-section h3 {
+  color: #2c3e50;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.3rem;
+}
+
+.terms-section p,
+.terms-section li {
+  line-height: 1.6;
+  color: #555;
+}
+
+.terms-section ul {
+  padding-left: 1.2rem;
+  margin-top: 0.5rem;
+}
+
 .close-button {
   background-color: #3498db;
   color: white;
@@ -385,7 +411,7 @@ pre {
   }
 }
 
-/* Responsive */
+/* ----------------- RESPONSIVE ----------------- */
 @media (max-width: 768px) {
   footer {
     flex-direction: column;
@@ -423,33 +449,4 @@ pre {
     font-size: 1.5em;
   }
 }
-
-.terms-section {
-  margin-bottom: 1.5rem;
-}
-
-.terms-section h3 {
-  color: #2c3e50;
-  font-size: 1.2rem;
-  margin-bottom: 0.5rem;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 0.3rem;
-}
-
-.terms-section p {
-  line-height: 1.6;
-  color: #555;
-}
-
-.terms-section ul {
-  padding-left: 1.2rem;
-  margin-top: 0.5rem;
-}
-
-.terms-section li {
-  margin-bottom: 0.5rem;
-  line-height: 1.5;
-  color: #555;
-}
-
 </style>

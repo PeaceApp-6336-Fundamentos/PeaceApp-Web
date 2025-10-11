@@ -121,6 +121,7 @@ export default {
   overflow-y: auto;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   margin: auto;
+  color: #000;
 }
 .flex {
   display: flex;
@@ -136,6 +137,26 @@ export default {
   padding: 8px;
   border-radius: 5px;
   border: 1px solid #ccc;
+  background-color: #fff;
+  color: #000;
+}
+.password-container {
+  display: flex;
+  align-items: center;
+}
+.eye-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 8px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+.eye-button svg {
+  background: transparent !important;
+  fill: none !important;
+  stroke: #000 !important;
 }
 .preview-img {
   width: 100px;
@@ -167,10 +188,55 @@ button {
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s;
+  color: #000;
 }
 button:hover {
   background-color: #eee;
 }
+
+/* === MODO OSCURO === */
+body.dark .popup {
+  background-color: #1e1e1e;
+  color: #f5f5f5;
+}
+body.dark .input-style {
+  background-color: #2b2b2b;
+  border: 1px solid #444;
+  color: #f5f5f5;
+}
+body.dark .input-style:focus {
+  outline: none;
+  border-color: #888;
+}
+body.dark .password-container input.input-style {
+  background-color: #2b2b2b;
+  color: #f5f5f5;
+  border: 1px solid #444;
+}
+body.dark .password-container input.input-style:focus {
+  outline: none;
+  border-color: #888;
+}
+body.dark .eye-button {
+  background-color: transparent !important;
+  appearance: none;
+  -webkit-appearance: none;
+}
+body.dark .eye-button svg {
+  stroke: #f5f5f5 !important;
+}
+body.dark .password-container {
+  background-color: transparent;
+}
+body.dark button {
+  background-color: #2a4772;
+  color: #f5f5f5;
+}
+body.dark button:hover {
+  background-color: #3a5c91;
+}
+
+/* === RESPONSIVE === */
 @media (max-width: 768px) {
   .popup {
     width: 95%;
@@ -191,4 +257,5 @@ button:hover {
     height: 80px;
   }
 }
+
 </style>

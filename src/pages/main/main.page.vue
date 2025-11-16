@@ -68,7 +68,7 @@ export default {
           const user = response.data;
           localStorage.setItem('authToken', user.token);
           localStorage.setItem('userEmail', user.username);
-          localStorage.setItem('userRole', 'ROLE_USER');
+          localStorage.setItem('userRole', user.role);
           localStorage.setItem('userId', user.id);
           return user;
         }

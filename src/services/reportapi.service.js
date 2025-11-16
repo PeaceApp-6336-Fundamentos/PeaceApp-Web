@@ -1,12 +1,12 @@
 import axios from "axios";
-import {environment} from "../environments/environment.js";
+import { environment } from "../environments/environment.js";
 
 export class ReportApiService {
     constructor() {
         this.baseUrl = environment.baseUrl;
     }
 
-    // Reusable headers with auth token
+    // Auth headers
     getAuthHeaders() {
         const token = localStorage.getItem("authToken");
         return {
@@ -15,8 +15,51 @@ export class ReportApiService {
         };
     }
 
+    // -------------------------------------------------------------
+    // CREATE REPORT
+    // -------------------------------------------------------------
+    async create(data) {
+        try {
+            return await axios.post(`${this.baseUrl}/reports`, data, {
+                headers: this.getAuthHeaders()
+            });
+        } catch (error) {
+            console.error("Error creating report", error);
+            return error.response;
+        }
+    }
 
-    // GET reports by user ID
+    // -------------------------------------------------------------
+    // GET REPORT BY ID
+    // -------------------------------------------------------------
+    async getById(id) {
+        try {
+            return await axios.get(`${this.baseUrl}/reports/${id}`, {
+                headers: this.getAuthHeaders()
+            });
+        } catch (error) {
+            console.error("Error fetching report by ID", error);
+            return error.response;
+        }
+    }
+
+    // -------------------------------------------------------------
+    // CHECK IF REPORT EXISTS
+    // -------------------------------------------------------------
+    async exists(id) {
+        try {
+            return await axios.get(`${this.baseUrl}/reports/${id}/exists`, {
+                headers: this.getAuthHeaders()
+            });
+        } catch (error) {
+            console.error("Error checking report existence", error);
+            return error.response;
+        }
+    }
+
+    // -------------------------------------------------------------
+    // GET REPORTS BY USER ID
+    // -------------------------------------------------------------
     async getByUserId(userId) {
         try {
             return await axios.get(`${this.baseUrl}/reports/user/${userId}`, {
@@ -28,7 +71,9 @@ export class ReportApiService {
         }
     }
 
-    // GET all reports
+    // -------------------------------------------------------------
+    // GET ALL REPORTS
+    // -------------------------------------------------------------
     async getAll() {
         try {
             return await axios.get(`${this.baseUrl}/reports`, {
@@ -40,14 +85,73 @@ export class ReportApiService {
         }
     }
 
-    // POST create a new report
-    async create(data) {
+    // -------------------------------------------------------------
+    // GET PUBLIC REPORTS (APPROVED)
+    // -------------------------------------------------------------
+    async getPublic() {
         try {
-            return await axios.post(`${this.baseUrl}/reports`, data, {
+            return await axios.get(`${this.baseUrl}/reports/public`, {
                 headers: this.getAuthHeaders()
             });
         } catch (error) {
-            console.error("Error creating report", error);
+            console.error("Error fetching public reports", error);
+            return error.response;
+        }
+    }
+
+    // -------------------------------------------------------------
+    // CHANGE STATE → IN REVIEW
+    // -------------------------------------------------------------
+    async markInReview(id) {
+        try {
+            return await axios.put(`${this.baseUrl}/reports/${id}/review`, {}, {
+                headers: this.getAuthHeaders()
+            });
+        } catch (error) {
+            console.error("Error marking report as In Review", error);
+            return error.response;
+        }
+    }
+
+    // -------------------------------------------------------------
+    // CHANGE STATE → APPROVED
+    // -------------------------------------------------------------
+    async approve(id) {
+        try {
+            return await axios.put(`${this.baseUrl}/reports/${id}/approve`, {}, {
+                headers: this.getAuthHeaders()
+            });
+        } catch (error) {
+            console.error("Error approving report", error);
+            return error.response;
+        }
+    }
+
+    // -------------------------------------------------------------
+    // CHANGE STATE → REJECTED (with reason)
+    // -------------------------------------------------------------
+    async reject(id, reason) {
+        try {
+            return await axios.put(`${this.baseUrl}/reports/${id}/reject`,
+                { reason },
+                { headers: this.getAuthHeaders() }
+            );
+        } catch (error) {
+            console.error("Error rejecting report", error);
+            return error.response;
+        }
+    }
+
+    // -------------------------------------------------------------
+    // DELETE REPORT
+    // -------------------------------------------------------------
+    async delete(id) {
+        try {
+            return await axios.delete(`${this.baseUrl}/reports/${id}`, {
+                headers: this.getAuthHeaders()
+            });
+        } catch (error) {
+            console.error("Error deleting report", error);
             return error.response;
         }
     }

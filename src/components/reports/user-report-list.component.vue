@@ -15,18 +15,26 @@
     </div>
     <div class="reports-container">
       <ul v-if="filteredReports.length" class="reports-grid">
-        <li v-for="report in filteredReports" :key="report.id" class="report-item">
+        <li v-for="report in filteredReports" :key="report.id" class="report-item" @click="$router.push({ name: 'report-detail', params: { id: report.id } })" style="cursor: pointer;">
           <h2>{{ report.title }}</h2>
           <p><strong>{{ $t('reports.type_label') }}</strong> {{ translateType(report.type) }}</p>
           <p><strong>{{ $t('reports.address_label') || 'Address:' }}</strong> {{ report.location }}</p>
           <p><strong>{{ $t('reports.description_label') }}</strong> {{ report.description }}</p>
+          <p><strong>{{ $t('reports.state_label') }}</strong> {{ translateState(report.state) }}</p>
           <p>
             <strong>{{ $t('reports.user_label') }}</strong>
             <span v-if="report.citizenFullName">{{ report.citizenFullName }}</span>
             <span v-else>{{ formatDate(report.createdAt) }}</span>
           </p>
-          <p v-if="report.imageUrl">
-            <strong>{{ $t('reports.evidence_label') || 'Evidence:' }}</strong><br>
+          <!-- Mostrar mensaje de rechazo -->
+          <p v-if="report.state === 'REJECTED' && report.rejectionReason?.trim()" style="color: #c0392b;">
+            <strong>{{ $t('reports.rejected_reason') }}</strong><br>
+            {{ report.rejectionReason }}
+          </p>
+
+          <!-- Mostrar imagen SOLO si no está rechazado -->
+          <p v-else-if="report.imageUrl">
+            <strong>{{ $t('reports.evidence_label') }}</strong><br>
             <img :src="report.imageUrl" alt="Evidence" style="max-width: 100%; border-radius: 8px; margin-top: 8px;" />
           </p>
 
@@ -82,6 +90,16 @@ export default {
     }
   },
   methods: {
+    translateState(state) {
+      const s = {
+        PENDING: this.$t('reportForm.placeholders.pending'),
+        APPROVED: this.$t('reportForm.placeholders.approved'),
+        REJECTED: this.$t('reportForm.placeholders.rejected'),
+        IN_REVIEW: this.$t('reportForm.placeholders.in_review')
+      };
+      return s[state] || state;
+    },
+
     translateType(type) {
       const types = {
         ROBBERY: this.$t('reportForm.placeholders.robbery'),
@@ -95,9 +113,21 @@ export default {
     async fetchReports() {
       try {
         const userId = localStorage.getItem("userId");
-        const response = this.reportScope === "all"
-            ? await this.api.getAll()
-            : await this.api.getByUserId(userId);
+        const role = localStorage.getItem("userRole");
+
+        let response;
+
+        if (this.reportScope === "user") {
+          response = await this.api.getByUserId(userId);
+
+        } else {
+          // Vista general
+          if (role === "ROLE_USER") {
+            response = await this.api.getPublic();
+          } else {
+            response = await this.api.getAll();
+          }
+        }
 
         this.reports = response.data;
 
@@ -107,6 +137,7 @@ export default {
             report.citizenFullName = res?.data?.fullName || null;
           }
         }
+
       } catch (error) {
         console.error("Error fetching reports:", error);
       }

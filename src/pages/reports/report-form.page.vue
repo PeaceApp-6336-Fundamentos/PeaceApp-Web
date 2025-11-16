@@ -82,7 +82,6 @@ import CitizenToolbar from "../../components/toolbar/toolbarCitizen.component.vu
 import CloudinaryService from "../../services/cloudinary.service.js";
 import { nextTick } from "vue";
 import mapboxgl from "mapbox-gl";
-import {LocationApiService} from "../../services/locationapi.service.js";
 
 export default {
   components: { CitizenToolbar },
@@ -100,7 +99,6 @@ export default {
         longitude: null
       },
       api: new ReportApiService(),
-      locationApi: new LocationApiService(),
       successMessage: "",
       showSuccessMessage: false,
       map: null,
@@ -142,14 +140,6 @@ export default {
         const reportResponse = await this.api.create(payload);
         const reportId = reportResponse?.data?.id;
         if (!reportId) throw new Error(this.$t('reportForm.errorNoReportId'));
-
-        // Crear ubicación asociada
-        await this.locationApi.createLocation({
-          latitude: this.reportData.latitude,
-          longitude: this.reportData.longitude,
-          idReport: reportId
-        });
-
         this.successMessage = this.$t('reportForm.successCreated');
         this.showSuccessMessage = true;
         setTimeout(() => {

@@ -1,4 +1,4 @@
 export const environment = {
     production: false,
-    baseUrl: "http://peaceapp.duckdns.org/api/v1"
+    baseUrl: "https://peaceapp.duckdns.org/api/v1"
 };
